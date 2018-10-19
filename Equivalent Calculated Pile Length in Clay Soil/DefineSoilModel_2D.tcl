@@ -19,7 +19,7 @@
 # -- 1. Modeled from up to down, left to right
 # -- 2. Input :
 # 		width:     	The width of soil layers;
-#       layerDepth: It's a list of depth for every soil layers;
+#       layerDepth: It's a list @of depth for every soil layers;
 #       enumX:		The element number in the horizon direction;
 #       Edata:		It's a list of element data in the vertical direction for every soil layers;
 #       			It must start with "S" for element size or "N" for element number;
@@ -38,12 +38,12 @@
 # 
 # 
 # 
-proc DefineSoilModel_2D { width {layerDepth {}} enumX {Edata { S 1.0 }} {startNodeTag 1} {startCoord {0.0 0.0}} }\
+proc DefineSoilModel_2D { width {layerDepth {1.0 }} enumX {Edata { S 1.0 }} {startNodeTag 1} {startCoord {0.0 0.0}} }\
 {
 	# ----Validity Check
 	set type [lindex $Edata 0]
 	if {([string equal $type S]==0 && [string equal $type N]==0)} {
-		puts "Erro: Data type identifier of element data isn\'t \'S\' or \'N\' in the vertical direction, please Check your input data!!!"
+		puts "Erro: Data type identifier of element data isn\'t \'S(string)\' or \'N(number)\' in the vertical direction, please Check your input data!!!"
 		return
 	}
 	# ----Soil Geometry Parameters
