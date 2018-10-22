@@ -1,50 +1,61 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-def log(func):
-	def wrapper(*args, **kw):
-		print('call %s():' % func.__name__)
-		return func(*args, **kw)
-	return wrapper
 
-@log
-def lineMesh(xlist,ylist,numlist,Nnum,Enum,nodeFile,eleFile):
+def lineMesh(xlist,ylist,numlist,Nnum,Enum,nodeFile,eleFile,SFlist):
 
-	def nodeCoord(xlist,ylist,numlist,Nnum):
+	def nodeData(xlist,ylist,num,Nnum,SF):
+		import math
+		import numpy as np 
 
-		
-		def nodeData(xlist,ylist,num,Nnum):
-			import math
-			import numpy as np 
+		# coordinate
+		x=xlist
+		y=ylist
 
-			# coordinate
-			x=xlist
-			y=ylist
+		# mesh parameters
+		x1,x2=x[0],x[1]
+		y1,y2=y[0],y[1]
+		n=num
+		x=[x1]
+		y=[y1]
 
-			# mesh parameters
-			x1,x2=x[0],x[1]
-			y1,y2=y[0],y[1]
-			n=num
-
+		if SF==1.0:
 			x=np.linspace(x1,x2,n+1)
 			y=np.linspace(y1,y2,n+1)
-			nn=range(Nnum,Nnum+n+1)
 			# array transform to list
 			x=x.tolist()
 			y=y.tolist()
-			# combine x with y
-			xy=zip(x,y)
-			coord=dict(zip(nn,xy))
-			return coord
+		else:
+			a1=(x2-x1)*(1-SF)/(1.0-SF**n)
+			b1=(y2-y1)*(1-SF)/(1.0-SF**n)
+			nn=1
+			while nn<=n:
+				san=a1*(1-SF**nn)/(1-SF)
+				sbn=b1*(1-SF**nn)/(1-SF)
+				x.append(x1+san)
+				y.append(y1+sbn)
+				nn=nn+1
+		nn=range(Nnum,Nnum+n+1)
+		# combine x with y
+		xy=zip(x,y)
+		coord=dict(zip(nn,xy))
+		return coord
+
+
+
+
+	def nodeCoord(xlist,ylist,numlist,Nnum,SFlist):
 
 		x1,x2=xlist[:-1],xlist[1:]
 		y1,y2=ylist[:-1],ylist[1:]
 
+		# zip the data to the shape of [xlist,ylist,num,Nnum,SF]
 		xx,yy=zip(x1,x2),zip(y1,y2)
-		xx=zip(xx,yy,numlist)
+		xx=zip(xx,yy,numlist,SFlist)
 		nodeCoord={}
 		for x in xx:
-			temp=nodeData(list(x[0]),list(x[1]),x[2],Nnum)
+			# nodeData(xlist,ylist,num,Nnum,SF)
+			temp=nodeData(list(x[0]),list(x[1]),x[2],Nnum,x[3])
 			Nnum=sorted(temp.keys())[-1]
 			nodeCoord=dict(nodeCoord,**temp)
 		return nodeCoord
@@ -79,7 +90,8 @@ def lineMesh(xlist,ylist,numlist,Nnum,Enum,nodeFile,eleFile):
 
 
 
-	nodeData=nodeCoord(xlist,ylist,numlist,Nnum)
+	nodeData=nodeCoord(xlist,ylist,numlist,Nnum,SFlist)
+	# print nodeData
 	eleData=eleData(nodeData,Enum)
 
 	write2file(nodeData,nodeFile)
@@ -87,11 +99,11 @@ def lineMesh(xlist,ylist,numlist,Nnum,Enum,nodeFile,eleFile):
 
 	return [sorted(nodeData.keys())[-1],sorted(eleData.keys())[-1]]
 
-xlist=[0,10,30,20]
-ylist=[0,0,10,10]
-numlist=[10,20,50]
+xlist=[0,10,10]
+ylist=[0,0,10]
+numlist=[10,20]
 nodeFile='/media/zarhin/Documents/WorkPath/OpenSeesGit/pythonLearning/node.txt'
 eleFile='/media/zarhin/Documents/WorkPath/OpenSeesGit/pythonLearning/ele.txt'
 
-a=lineMesh(xlist,ylist,numlist,100,10,nodeFile,eleFile)
+a=lineMesh(xlist,ylist,numlist,100,10,nodeFile,eleFile,[1.5,1.2])
 print a
