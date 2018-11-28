@@ -108,8 +108,8 @@ def lineMesh(xlist,ylist,numlist,Nnum,Enum,nodeFile,eleFile,SFlist):
 xlist=[0,10]
 ylist=[0,10]
 numlist=[10,20]
-nodeFile='/media/zarhin/Documents/WorkPath/OpenSeesGit/pythonLearning/node.txt'
-eleFile='/media/zarhin/Documents/WorkPath/OpenSeesGit/pythonLearning/ele.txt'
+nodeFile='E:/Desktop/node.txt'
+eleFile='E:/Desktop/ele.txt'
 
 a=lineMesh(xlist,ylist,numlist,1,1,nodeFile,eleFile,[2,5])
-print a
+print(a)
